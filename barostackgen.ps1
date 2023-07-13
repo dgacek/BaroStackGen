@@ -14,14 +14,13 @@ if (Test-Path -Path $output_catalog_name) {
 
     Get-ChildItem -Recurse -Filter *.xml -Exclude Legacy* | ForEach-Object {
         $xml = [xml](Get-Content -Path $_.FullName)
-        $nodes = $xml.Items.Item | where {$_.maxstacksize}
+        $nodes = $xml.Items.Item | Where-Object {$_.maxstacksize}
         $filepath = $_.FullName
         $filename = $_.Name
         $nodes | ForEach-Object {
             $_.maxstacksize = $size_value
             if ($_.Sprite.texture -notmatch "Content/Items") { # fix for relative texture paths
-                $to_replace = $pwd.ToString()
-                $content_path = $filepath.Replace($to_replace, 'Content/Items').Replace('\', '/').Replace($filename, $_.Sprite.texture)
+                $content_path = $filepath.Replace($pwd.ToString(), 'Content/Items').Replace('\', '/').Replace($filename, $_.Sprite.texture)
                 $_.Sprite.texture = $content_path
             }
         }
@@ -36,7 +35,7 @@ if (Test-Path -Path $output_catalog_name) {
             
             $new_filelist_element = $filelist.CreateElement("Item")
             $new_filelist_element.SetAttribute("file", "%ModDir%/$($filename)")
-            $filelist.SelectSingleNode('contentpackage').AppendChild($new_filelist_element)
+            $filelist.SelectSingleNode('//contentpackage').AppendChild($new_filelist_element)
         }
     }
     $filelist.Save($filelist_path)
