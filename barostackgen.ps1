@@ -1,12 +1,15 @@
+######## PARAMETERS
 $size_value = '63'
 $output_catalog_name = 'barostackgen_output'
+$mod_name = 'Max Stack Size'
+######## END PARAMETERS
 
 if (Test-Path -Path $output_catalog_name) {
     "Folder $($output_catalog_name) already exists. Delete it and run the script again."
 } else {
     New-Item -ItemType Directory $output_catalog_name
     $filelist_path = ".\$($output_catalog_name)\filelist.xml"
-    New-Item -Path $filelist_path -Value '<contentpackage name="Max Stack Size"></contentpackage>'
+    New-Item -Path $filelist_path -Value "<contentpackage name=`"$($mod_name)`"></contentpackage>"
     $filelist = [xml](Get-Content -Path $filelist_path)
 
     Get-ChildItem -Recurse -Filter *.xml -Exclude Legacy* | ForEach-Object {
