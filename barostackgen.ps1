@@ -11,6 +11,8 @@ if (Test-Path -Path $output_catalog_name) {
     $filelist_path = ".\$($output_catalog_name)\filelist.xml"
     New-Item -Path $filelist_path -Value "<contentpackage name=`"$($mod_name)`"></contentpackage>"
     $filelist = [xml](Get-Content -Path $filelist_path)
+    $log_path = ".\$($output_catalog_name)\barostackgen_log.txt"
+    New-Item -Path $log_path
 
     Get-ChildItem -Recurse -Filter *.xml -Exclude Legacy* | ForEach-Object {
         $xml = [xml](Get-Content -Path $_.FullName)
@@ -18,9 +20,11 @@ if (Test-Path -Path $output_catalog_name) {
         $filepath = $_.FullName
         $filename = $_.Name
         $nodes | ForEach-Object {
+            Add-Content $log_path "[$($filename)]    $($_.identifier)    ((maxstacksize): $($_.maxstacksize)->$($size_value))"
             $_.maxstacksize = $size_value
-            if ($_.Sprite.texture -notmatch "Content/Items") { # fix for relative texture paths
+            if ($_.Sprite.texture -notmatch "Content/") { # fix for relative texture paths
                 $content_path = $filepath.Replace($pwd.ToString(), 'Content/Items').Replace('\', '/').Replace($filename, $_.Sprite.texture)
+                Add-Content $log_path "[$($filename)]    $($_.identifier)    ((Sprite.texture): $($_.Sprite.texture)->$($content_path))"
                 $_.Sprite.texture = $content_path
             }
         }
