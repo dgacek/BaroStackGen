@@ -15,9 +15,15 @@ if (Test-Path -Path $output_catalog_name) {
     Get-ChildItem -Recurse -Filter *.xml -Exclude Legacy* | ForEach-Object {
         $xml = [xml](Get-Content -Path $_.FullName)
         $nodes = $xml.Items.Item | where {$_.maxstacksize}
+        $filepath = $_.FullName
         $filename = $_.Name
         $nodes | ForEach-Object {
             $_.maxstacksize = $size_value
+            if ($_.Sprite.texture -notmatch "Content/Items") { # fix for relative texture paths
+                $to_replace = $pwd.ToString()
+                $content_path = $filepath.Replace($to_replace, 'Content/Items').Replace('\', '/').Replace($filename, $_.Sprite.texture)
+                $_.Sprite.texture = $content_path
+            }
         }
         if ($nodes -ne $null) {  
             $output_filepath = ".\$($output_catalog_name)\$($filename)"
