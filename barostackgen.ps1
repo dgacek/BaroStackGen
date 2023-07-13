@@ -16,7 +16,7 @@ if (Test-Path -Path $output_catalog_name) {
 
     Get-ChildItem -Recurse -Filter *.xml -Exclude Legacy* | ForEach-Object {
         $xml = [xml](Get-Content -Path $_.FullName)
-        $nodes = $xml.Items.Item | Where-Object {$_.maxstacksize}
+        $nodes = $xml.Items.Item | Where-Object {$_.maxstacksize -and $_.maxstacksize -ne "1"}
         $filepath = $_.FullName
         $filename = $_.Name
         $nodes | ForEach-Object {
